@@ -20,6 +20,7 @@ import {
 import { useEffect, useState } from 'react';
 import './App.css';
 import SlideDialog from './SlideDialog';
+import SimpleBackdrop from './SimpleBackdrop';
 
 const apiUrl = 'https://jsonplaceholder.typicode.com/';
 
@@ -51,6 +52,7 @@ interface User {
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [searchBar, setSearchBar] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
     const searchedUsers = users.map((user: User) => {
@@ -66,13 +68,20 @@ function App() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      await fetch(apiUrl + 'users')
-        .then((data) => data.json())
-        .then((users) => {
-          users.forEach((user: User) => (user.visibility = true));
-          setUsers(users);
-        })
-        .catch((error) => console.error(error));
+      try {
+        setIsLoading(true);
+        const response = await fetch(apiUrl + 'users');
+        const data = await response.json();
+        const newUsers = data.map((user: User) => {
+          user.visibility = true;
+          return user;
+        });
+        setUsers(newUsers);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchUsers();
@@ -154,7 +163,9 @@ function App() {
             {keys.map((key, index) => (
               <ListItem key={index}>
                 <ListItemText
-                  primary={'Company ' + key.charAt(0).toUpperCase() + key.slice(1)}
+                  primary={
+                    'Company ' + key.charAt(0).toUpperCase() + key.slice(1)
+                  }
                   secondary={
                     <Typography
                       sx={{ display: 'inline' }}
@@ -185,9 +196,11 @@ function App() {
         p: 4,
         backgroundColor: '#939395',
         color: 'white',
-        height: '100%'
+        minHeight: '100vh',
+        height: '100%',
       }}
     >
+      <SimpleBackdrop openOn={isLoading} />
       <Card
         sx={{
           display: 'flex',
@@ -229,7 +242,7 @@ function App() {
           <Card
             key={index}
             sx={{
-              display: user.visibility ? 'block': 'none',
+              display: user.visibility ? 'block' : 'none',
               borderRadius: '20px',
               height: '480px',
               width: '480px',
