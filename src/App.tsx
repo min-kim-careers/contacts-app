@@ -204,11 +204,14 @@ function App() {
       <Card
         sx={{
           display: 'flex',
+          position: 'fixed',
+          top: 0,
           justifyContent: 'center',
           alignSelf: 'center',
           width: '480px',
           p: 2,
           borderRadius: '20px',
+          zIndex: 2,
         }}
       >
         <CardContent>
@@ -236,6 +239,7 @@ function App() {
           justifyContent: 'center',
           alignContent: 'center',
           alignItems: 'center',
+          paddingTop: '13vh'
         }}
       >
         {users.map((user, index) => (
